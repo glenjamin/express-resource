@@ -11,6 +11,7 @@
  */
 
 var express = require('express')
+  , methods = require('methods')
   , lingo = require('lingo')
   , en = lingo.en;
 
@@ -27,7 +28,7 @@ var orderedActions = [
   ,'update'  //  PUT  /:id
   ,'destroy' //  DEL  /:id
 ];
-  
+
 /**
  * Initialize a new `Resource` with the given `name` and `actions`.
  *
@@ -80,7 +81,7 @@ Resource.prototype.load = function(fn){
       req[id] = obj;
       next();
     };
-    
+
     // Maintain backward compatibility
     if (2 == fn.length) {
       fn(req.params[id], callback);
@@ -231,7 +232,7 @@ Resource.prototype.mapDefaultAction = function(key, fn){
  * Setup http verb methods.
  */
 
-express.router.methods.concat(['del', 'all']).forEach(function(method){
+methods.concat(['del', 'all']).forEach(function(method){
   Resource.prototype[method] = function(path, fn){
     if ('function' == typeof path
       || 'object' == typeof path) fn = path, path = '';
@@ -249,8 +250,7 @@ express.router.methods.concat(['del', 'all']).forEach(function(method){
  * @api public
  */
 
-express.HTTPServer.prototype.resource =
-express.HTTPSServer.prototype.resource = function(name, actions, opts){
+var resource = function(name, actions, opts){
   var options = actions || {};
   if ('object' == typeof name) actions = name, name = null;
   if (options.id) actions.id = options.id;
@@ -260,3 +260,17 @@ express.HTTPSServer.prototype.resource = function(name, actions, opts){
   var res = this.resources[name] = new Resource(name, actions, this);
   return res;
 };
+
+
+// Express 2.x
+if (express.HTTPServer) {
+  express.HTTPServer.prototype.resource = resource;
+}
+if (express.HTTPSServer) {
+  express.HTTPSServer.prototype.resource = resource;
+}
+
+// Express 3.x
+if (express.application) {
+  express.application.resource = resource;
+}

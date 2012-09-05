@@ -6,7 +6,10 @@
   , "contributors": [
     { "name": "Daniel Gasienica", "email": "daniel@gasienica.ch" }
   ]
-  , "dependencies": { "lingo": ">= 0.0.4" }
+  , "dependencies": {
+      "lingo": ">= 0.0.4"
+    , "methods": "0.0.1"
+  }
   , "devDependencies": {
       "connect": "1.8.x"
     , "express": "2.5.x"
